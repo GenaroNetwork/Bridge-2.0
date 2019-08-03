@@ -63,4 +63,34 @@
 前`block_num-1`个block的大小`block_size` = `ceil(shard_size / block_num)`，最后1个block大小`last_block_size` = `shard_size` - `block_size` * `block_num`。
 
 PS：存在的问题：假设同时下载10个100M的文件，根据libgenaro1.0的分片策略，共分成22片，同时下载10片，每片的block_num为5，也就是可能同时有10 * 10 * 5 = 500个线程在运行，线程调度的开销非常大，并且由于每个线程一般至少占8MB内存，单纯下载的线程可能就会占4GB左右虚存。
-	
+
+## 断点续传
+
+​	对于暂时性的断网，或者暂停后的断点续传相对简单，如果要考虑关机后下次继续上传或下载，对于上传来说可能会有点问题，因为每次上传都会重新选择Farmer。对于下载很好实现，因为下载的数据保存在本地，即使重新分配了Farmer，也可以继续从其他Farmer中下载未下载完的数据。
+
+​	考虑到token的时效性，以及farmer可能经常变化，此次**只考虑短暂性的暂停**，即如果用户不退出程序，将可以断点续传，一旦退出，将无法断点续传。
+
+### 下载
+
+​	增加如下接口：
+
+- int genaro_bridge_resolve_file_pause(genaro_download_state_t *state)
+
+  暂停下载任务。
+
+- int genaro_bridge_resolve_file_resume(genaro_download_state_t *state)
+
+  恢复下载任务。当用户暂停下载任务后，可以恢复下载；当下载任务下载失败后，也可以根据具体情况判断是否能恢复下载，不能的话就重新下载。恢复下载时不会下载已经完成的内容，即进行断点续传。
+  
+
+### 上传
+
+​	增加如下接口：
+
+- int genaro_bridge_store_file_pause(genaro_upload_state_t *state)
+
+  暂停上传任务。
+
+- int genaro_bridge_store_file_resume(genaro_upload_state_t *state)
+
+  恢复上传任务。当用户暂停上传任务后，可以恢复上传；当上传任务上传失败后，也可以根据具体情况判断是否能恢复上传，不能的话就重新上传。恢复上传时不会上传已经完成的内容，即进行断点续传。`	
