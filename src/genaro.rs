@@ -21,7 +21,7 @@ impl<T: Transport> Genaro<T> {
         CallFuture::new(self.transport.execute("eth_getBucketTxInfo", vec![from, to]))
     }
     // 获取交易信息: 购买流量
-    pub fn get_traffic_tx_info(&self, from_block: Option<BlockNumber>, to_block: Option<BlockNumber>) -> web3::helpers::CallFuture<H256, T::Out> {
+    pub fn get_traffic_tx_info(&self, from_block: Option<BlockNumber>, to_block: Option<BlockNumber>) -> web3::helpers::CallFuture<Option<Vec<TrafficTxInfo>>, T::Out> {
         let from = serialize(&from_block.unwrap_or(BlockNumber::Earliest));
         let to = serialize(&to_block.unwrap_or(BlockNumber::Latest));
         CallFuture::new(self.transport.execute("eth_getTrafficTxInfo", vec![from, to]))
@@ -39,5 +39,12 @@ pub struct BucketTxInfo {
     time_end: u32,
     backup: u32,
     size: u32,
+    hash: H256,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TrafficTxInfo {
+    address: H160,
+    traffic: u32,
     hash: H256,
 }

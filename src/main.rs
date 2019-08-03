@@ -1,6 +1,5 @@
 use web3::futures::Future;
-use web3::types::{BlockNumber, Address};
-use std::convert::TryFrom;
+use web3::types::BlockNumber;
 
 mod genaro;
 
@@ -20,6 +19,13 @@ fn main() {
         Some(BlockNumber::Number(186399)))
         .wait().unwrap();
     println!("{:#?}", bucket_tx_info);
+
+    // 测试 get_traffic_tx_info
+    let traffic_tx_info = g.get_traffic_tx_info(
+        Some(BlockNumber::Number(200000)),
+        Some(BlockNumber::Number(286400)))
+        .wait().unwrap();
+    println!("{:#?}", traffic_tx_info);
 
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
