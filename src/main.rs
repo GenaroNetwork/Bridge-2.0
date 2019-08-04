@@ -27,6 +27,12 @@ fn main() {
         .wait().unwrap();
     println!("{:#?}", traffic_tx_info);
 
+    let traffic_tx_info = g.get_bucket_supplement_tx(
+        Some(BlockNumber::Number(200000)),
+        Some(BlockNumber::Number(286400)))
+        .wait().unwrap();
+    println!("{:#?}", traffic_tx_info);
+
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);
