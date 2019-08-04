@@ -50,6 +50,16 @@ impl<T: Transport> Genaro<T> {
         let to = serialize(&to_block.unwrap_or(BlockNumber::Latest));
         CallFuture::new(self.transport.execute("eth_getBucketSupplementTx", vec![from, to]))
     }
+    pub fn get_address_by_node(
+        &self,
+        node: H160,
+    )
+        -> web3::helpers::CallFuture<Option<H160>, T::Out>
+    {
+        let node_str = hex::encode(node.as_bytes());
+        let node_value = serde_json::to_value(&node_str).unwrap();
+        CallFuture::new(self.transport.execute("eth_getAddressByNode", vec![node_value]))
+    }
 }
 
 #[derive(Debug, Deserialize)]

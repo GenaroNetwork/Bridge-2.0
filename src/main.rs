@@ -27,11 +27,18 @@ fn main() {
         .wait().unwrap();
     println!("{:#?}", traffic_tx_info);
 
-    let traffic_tx_info = g.get_bucket_supplement_tx(
+    let bucket_supplement_tx = g.get_bucket_supplement_tx(
         Some(BlockNumber::Number(200000)),
         Some(BlockNumber::Number(286400)))
         .wait().unwrap();
-    println!("{:#?}", traffic_tx_info);
+    println!("{:#?}", bucket_supplement_tx);
+
+    let addr_vec = hex::decode("511cb72a70f522cc4becfb9400cecf4b1ccc2916").unwrap();
+    let mut addr = [0u8; 20];
+    addr.clone_from_slice(&addr_vec);
+    let addr = g.get_address_by_node(addr.into())
+        .wait().unwrap();
+    println!("{:#?}", addr);
 
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
