@@ -33,10 +33,14 @@ fn main() {
         .wait().unwrap();
     println!("{:#?}", bucket_supplement_tx);
 
-    let addr_vec = hex::decode("511cb72a70f522cc4becfb9400cecf4b1ccc2916").unwrap();
+    let addr = g.get_address_by_node("511cb72a70f522cc4becfb9400cecf4b1ccc2916")
+        .wait().unwrap();
+    println!("{:#?}", addr);
+
+    let addr_vec = hex::decode("73e39b82d3fE58B52F718ea1aB85B4f4929e20d1").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);
-    let addr = g.get_address_by_node(addr.into())
+    let addr = g.get_storage_nodes(addr.into())
         .wait().unwrap();
     println!("{:#?}", addr);
 
