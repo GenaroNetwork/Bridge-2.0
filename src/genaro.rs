@@ -1,6 +1,6 @@
 //use web3::futures::Future;
 use web3::Transport;
-use web3::types::{H256, BlockNumber, H160};
+use web3::types::{H256, BlockNumber, H160, U256};
 use web3::helpers::{CallFuture, serialize};
 use serde::{Deserialize, Serialize};
 
@@ -56,7 +56,7 @@ impl<T: Transport> Genaro<T> {
     )
         -> web3::helpers::CallFuture<Option<H160>, T::Out>
     {
-        let node_value = serde_json::to_value(&node).unwrap();
+        let node_value = serialize(&node);
         CallFuture::new(self.transport.execute("eth_getAddressByNode", vec![node_value]))
     }
     pub fn get_storage_nodes(
@@ -67,6 +67,17 @@ impl<T: Transport> Genaro<T> {
     {
         let address_value = serialize(&address);
         CallFuture::new(self.transport.execute("eth_getStorageNodes", vec![address_value]))
+    }
+    pub fn get_stake(
+        &self,
+        address: H160,
+        block: BlockNumber,
+    )
+        -> web3::helpers::CallFuture<Option<U256>, T::Out>
+    {
+        let address_value = serialize(&address);
+        let block_value = serialize(&block);
+        CallFuture::new(self.transport.execute("eth_getStake", vec![address_value, block_value]))
     }
 }
 

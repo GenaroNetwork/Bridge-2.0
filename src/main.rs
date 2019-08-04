@@ -27,22 +27,34 @@ fn main() {
         .wait().unwrap();
     println!("{:#?}", traffic_tx_info);
 
+    // 测试 get_bucket_supplement_tx
     let bucket_supplement_tx = g.get_bucket_supplement_tx(
         Some(BlockNumber::Number(200000)),
         Some(BlockNumber::Number(286400)))
         .wait().unwrap();
     println!("{:#?}", bucket_supplement_tx);
 
+    // 测试 get_address_by_node
     let addr = g.get_address_by_node("511cb72a70f522cc4becfb9400cecf4b1ccc2916")
         .wait().unwrap();
     println!("{:#?}", addr);
 
+    // 测试 get_storage_nodes
     let addr_vec = hex::decode("73e39b82d3fE58B52F718ea1aB85B4f4929e20d1").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);
     let addr = g.get_storage_nodes(addr.into())
         .wait().unwrap();
     println!("{:#?}", addr);
+
+    // 测试 get_stake
+    let addr_vec = hex::decode("73e39b82d3fE58B52F718ea1aB85B4f4929e20d1").unwrap();
+    let mut addr = [0u8; 20];
+    addr.clone_from_slice(&addr_vec);
+    let stake = g.get_stake(addr.into(), BlockNumber::Latest)
+        .wait().unwrap();
+    println!("{:?}", stake);
+
 
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
