@@ -65,14 +65,19 @@ fn main() {
     let addr_vec = hex::decode("73e39b82d3fE58B52F718ea1aB85B4f4929e20d1").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);
-    let stake = g.get_heft(addr.into(), BlockNumber::Latest)
+    let heft = g.get_heft(addr.into(), BlockNumber::Latest)
         .wait().unwrap();
-    println!("{:?}", stake);
+    println!("{:?}", heft);
 
     // 测试 get_candidates
-    let back_stake = g.get_candidates(BlockNumber::Latest)
+    let candidates = g.get_candidates(BlockNumber::Latest)
         .wait().unwrap();
-    println!("{:#?}", back_stake);
+    println!("{:#?}", candidates);
+
+    // 测试 get_committee_rank
+    let committee = g.get_committee_rank(BlockNumber::Latest)
+        .wait().unwrap();
+    println!("{:#?}", committee);
 
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
