@@ -88,6 +88,17 @@ impl<T: Transport> Genaro<T> {
         let block_value = serialize(&block);
         CallFuture::new(self.transport.execute("eth_getAlreadyBackStakeList", vec![block_value]))
     }
+    pub fn get_heft(
+        &self,
+        address: H160,
+        block: BlockNumber,
+    )
+        -> web3::helpers::CallFuture<Option<U256>, T::Out>
+    {
+        let address_value = serialize(&address);
+        let block_value = serialize(&block);
+        CallFuture::new(self.transport.execute("eth_getHeft", vec![address_value, block_value]))
+    }
 }
 
 #[derive(Debug, Deserialize)]
