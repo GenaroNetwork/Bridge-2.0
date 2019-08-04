@@ -55,6 +55,12 @@ fn main() {
         .wait().unwrap();
     println!("{:?}", stake);
 
+    // 测试 get_already_back_stake_list
+    // FIXME
+    let back_stake = g.get_already_back_stake_list(BlockNumber::Latest)
+        .wait().unwrap();
+    println!("{:?}", back_stake);
+
 
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];

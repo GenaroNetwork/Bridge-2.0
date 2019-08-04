@@ -1,6 +1,6 @@
 //use web3::futures::Future;
 use web3::Transport;
-use web3::types::{H256, BlockNumber, H160, U256};
+use web3::types::{BlockNumber, H256, H160, U256};
 use web3::helpers::{CallFuture, serialize};
 use serde::{Deserialize, Serialize};
 
@@ -78,6 +78,15 @@ impl<T: Transport> Genaro<T> {
         let address_value = serialize(&address);
         let block_value = serialize(&block);
         CallFuture::new(self.transport.execute("eth_getStake", vec![address_value, block_value]))
+    }
+    pub fn get_already_back_stake_list(
+        &self,
+        block: BlockNumber,
+    )
+        -> web3::helpers::CallFuture<Option<Vec<U256>>, T::Out>
+    {
+        let block_value = serialize(&block);
+        CallFuture::new(self.transport.execute("eth_getAlreadyBackStakeList", vec![block_value]))
     }
 }
 
