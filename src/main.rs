@@ -69,6 +69,11 @@ fn main() {
         .wait().unwrap();
     println!("{:?}", stake);
 
+    // 测试 get_candidates
+    let back_stake = g.get_candidates(BlockNumber::Latest)
+        .wait().unwrap();
+    println!("{:#?}", back_stake);
+
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);
