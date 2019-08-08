@@ -117,6 +117,15 @@ impl<T: Transport> Genaro<T> {
         let block_value = serialize(&block);
         CallFuture::new(self.transport.execute("eth_getCommitteeRank", vec![block_value]))
     }
+    pub fn get_main_account_rank(
+        &self,
+        block: BlockNumber,
+    )
+        -> web3::helpers::CallFuture<Option<Vec<H160>>, T::Out>
+    {
+        let block_value = serialize(&block);
+        CallFuture::new(self.transport.execute("eth_getMainAccountRank", vec![block_value]))
+    }
 }
 
 #[derive(Debug, Deserialize)]

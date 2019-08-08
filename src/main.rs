@@ -77,11 +77,16 @@ fn main() {
     // 测试 get_committee_rank
     let committee = g.get_committee_rank(BlockNumber::Latest)
         .wait().unwrap();
-    println!("{:#?}", committee);
+    println!("committee {:#?}", committee);
+
+    // 测试 get_main_account_rank
+    let account_rank = g.get_main_account_rank(BlockNumber::Latest)
+        .wait().unwrap();
+    println!("account_rank {:#?}", account_rank);
 
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);
     let balance = web3.eth().balance(addr.into(), None).wait().unwrap();
-    println!("{:#?}", balance)
+    println!("balance {:#?}", balance)
 }
