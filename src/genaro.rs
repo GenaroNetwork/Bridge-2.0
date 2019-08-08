@@ -1,6 +1,6 @@
 //use web3::futures::Future;
 use web3::Transport;
-use web3::types::{BlockNumber, H256, H160, U256};
+use web3::types::{BlockNumber, U256, H256, H160};
 use web3::helpers::{CallFuture, serialize};
 use serde::{Deserialize, Serialize};
 
@@ -137,6 +137,15 @@ impl<T: Transport> Genaro<T> {
         let block_value = serialize(&block);
         CallFuture::new(self.transport.execute("eth_getGenaroCodeHash", vec![address_value, block_value]))
     }
+    pub fn get_extra(
+        &self,
+        block: BlockNumber,
+    )
+        -> web3::helpers::CallFuture<Option<ExtraInfo>, T::Out>
+    {
+        let block_value = serialize(&block);
+        CallFuture::new(self.transport.execute("eth_getExtra", vec![block_value]))
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -170,4 +179,18 @@ pub struct BucketSupplementTx {
     #[serde(rename(deserialize = "blockNum"))]
     block_num: u32,
     hash: H256,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ExtraInfo {
+    #[serde(rename(deserialize = "committeeRank"))]
+    committee_rank: Option<String>,
+    #[serde(rename(deserialize = "lastBlockNum"))]
+    last_block_num: u32,
+    #[serde(rename(deserialize = "lastSynBlockHash"))]
+    last_syn_block_hash: H256,
+    signature: String,
+    ratio: Option<f64>,
+    #[serde(rename(deserialize = "CommitteeAccountBinding"))]
+    committee_account_binding: Option<String>,
 }

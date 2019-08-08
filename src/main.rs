@@ -92,6 +92,11 @@ fn main() {
         .wait().unwrap();
     println!("code_hash {:?}", code_hash);
 
+    // 测试 get_extra
+    let extra = g.get_extra(BlockNumber::Latest)
+        .wait().unwrap();
+    println!("extra {:#?}", extra);
+
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);
