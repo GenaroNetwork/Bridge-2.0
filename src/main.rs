@@ -84,6 +84,14 @@ fn main() {
         .wait().unwrap();
     println!("account_rank {:#?}", account_rank);
 
+    // 测试 get_genaro_code_hash
+    let addr_vec = hex::decode("73e39b82d3fE58B52F718ea1aB85B4f4929e20d1").unwrap();
+    let mut addr = [0u8; 20];
+    addr.clone_from_slice(&addr_vec);
+    let code_hash = g.get_genaro_code_hash(addr.into(), BlockNumber::Latest)
+        .wait().unwrap();
+    println!("code_hash {:?}", code_hash);
+
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);

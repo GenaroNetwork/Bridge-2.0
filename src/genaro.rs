@@ -126,6 +126,17 @@ impl<T: Transport> Genaro<T> {
         let block_value = serialize(&block);
         CallFuture::new(self.transport.execute("eth_getMainAccountRank", vec![block_value]))
     }
+    pub fn get_genaro_code_hash(
+        &self,
+        address: H160,
+        block: BlockNumber,
+    )
+        -> web3::helpers::CallFuture<Option<String>, T::Out>
+    {
+        let address_value = serialize(&address);
+        let block_value = serialize(&block);
+        CallFuture::new(self.transport.execute("eth_getGenaroCodeHash", vec![address_value, block_value]))
+    }
 }
 
 #[derive(Debug, Deserialize)]
