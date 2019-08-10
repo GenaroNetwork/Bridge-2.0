@@ -97,6 +97,11 @@ fn main() {
         .wait().unwrap();
     println!("extra {:#?}", extra);
 
+    // 测试 get_genaro_price
+    let extra = g.get_genaro_price(BlockNumber::Latest)
+        .wait().unwrap();
+    println!("extra {:#?}", extra);
+
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);

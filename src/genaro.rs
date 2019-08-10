@@ -146,6 +146,15 @@ impl<T: Transport> Genaro<T> {
         let block_value = serialize(&block);
         CallFuture::new(self.transport.execute("eth_getExtra", vec![block_value]))
     }
+    pub fn get_genaro_price(
+        &self,
+        block: BlockNumber,
+    )
+        -> web3::helpers::CallFuture<Option<GenaroPrice>, T::Out>
+    {
+        let block_value = serialize(&block);
+        CallFuture::new(self.transport.execute("eth_getGenaroPrice", vec![block_value]))
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -193,4 +202,18 @@ pub struct ExtraInfo {
     ratio: Option<f64>,
     #[serde(rename(deserialize = "CommitteeAccountBinding"))]
     committee_account_binding: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct GenaroPrice {
+    #[serde(rename(deserialize = "bucketPricePerGperDay"))]
+    bucket_price_per_g_day: U256,
+    #[serde(rename(deserialize = "oneDayMortgageGes"))]
+    one_day_mortgage_ges: U256,
+    #[serde(rename(deserialize = "oneDaySyncLogGsaCost"))]
+    one_day_sync_log_gsa_cost: U256,
+    #[serde(rename(deserialize = "stakeValuePerNode"))]
+    stake_value_per_node: U256,
+    #[serde(rename(deserialize = "trafficPricePerG"))]
+    traffic_price_per_g: U256,
 }
