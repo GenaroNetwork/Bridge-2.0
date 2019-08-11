@@ -334,3 +334,34 @@ static void list_files_request_worker(uv_work_t *work)
 
     free(p_is_share);
 }
+
+static json_request_t *json_request_new(
+    genaro_http_options_t *http_options,
+    genaro_encrypt_options_t *encrypt_options,
+    genaro_bridge_options_t *options,
+    char *method,
+    char *path,
+    struct json_object *request_body,
+    bool auth,
+    void *handle)
+{
+
+    json_request_t *req = malloc(sizeof(json_request_t));
+    if (!req) {
+        return NULL;
+    }
+
+    req->http_options = http_options;
+    req->encrypt_options = encrypt_options;
+    req->options = options;
+    req->method = method;
+    req->path = path;
+    req->auth = auth;
+    req->body = request_body;
+    req->response = NULL;
+    req->error_code = 0;
+    req->status_code = 0;
+    req->handle = handle;
+
+    return req;
+}
