@@ -227,10 +227,11 @@ pub struct GenaroPrice {
 
 #[derive(Debug, Deserialize)]
 pub struct AdminNodeInfo {
+    #[serde(rename(deserialize = "listenAddr"))]
+    listen_addr: String,
     enode: String,
     id: String,
     ip: String,
-    listenAddr: String,
     name: String,
     ports: NodePort,
     protocols: NodeProtocol,
@@ -258,26 +259,41 @@ struct NodeProtocolEth {
 
 #[derive(Debug, Deserialize)]
 struct NodeProtocolEthConfig {
-    byzantiumBlock: u32,
-    chainId: u32,
-    eip150Block: u32,
-    eip150Hash: H256,
-    eip155Block: u32,
-    eip158Block: u32,
-    homesteadBlock: u32,
+    #[serde(rename(deserialize = "byzantiumBlock"))]
+    byzantium_block: u32,
+    #[serde(rename(deserialize = "chainId"))]
+    chain_id: u32,
+    #[serde(rename(deserialize = "eip150Block"))]
+    eip150block: u32,
+    #[serde(rename(deserialize = "eip150Hash"))]
+    eip150hash: H256,
+    #[serde(rename(deserialize = "eip155Block"))]
+    eip155block: u32,
+    #[serde(rename(deserialize = "eip158Block"))]
+    eip158block: u32,
+    #[serde(rename(deserialize = "homesteadBlock"))]
+    homestead_block: u32,
     genaro: NodeProtocolEthConfigGenaro,
 }
 
 #[derive(Debug, Deserialize)]
 struct NodeProtocolEthConfigGenaro {
-    OfficialAddress: String,
-    PromissoryNotePrice: u32,
-    blockInterval: u32,
-    committeeMaxSize: u32,
-    currencyRates: u32,
-    electionPeriod: u32,
-    epoch: u64,
-    optionTxMemorySize: u32,
+    #[serde(rename(deserialize = "OfficialAddress"))]
+    official_address: String,
+    #[serde(rename(deserialize = "PromissoryNotePrice"))]
+    promissory_note_price: u32,
+    #[serde(rename(deserialize = "blockInterval"))]
+    block_interval: u32,
+    #[serde(rename(deserialize = "committeeMaxSize"))]
+    committee_max_size: u32,
+    #[serde(rename(deserialize = "currencyRates"))]
+    currency_rates: u32,
+    #[serde(rename(deserialize = "electionPeriod"))]
+    election_period: u32,
+    #[serde(rename(deserialize = "optionTxMemorySize"))]
+    option_tx_memory_size: u32,
+    #[serde(rename(deserialize = "validPeriod"))]
+    valid_period: u32,
     period: u32,
-    validPeriod: u32,
+    epoch: u64,
 }
