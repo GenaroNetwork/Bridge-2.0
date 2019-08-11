@@ -401,3 +401,29 @@ static list_files_request_t *list_files_request_new(
 
     return req;
 }
+
+static create_bucket_request_t *create_bucket_request_new(
+    genaro_http_options_t *http_options,
+    genaro_bridge_options_t *bridge_options,
+    genaro_encrypt_options_t *encrypt_options,
+    const char *bucket_name,
+    void *handle)
+{
+    create_bucket_request_t *req = malloc(sizeof(create_bucket_request_t));
+    if (!req) {
+        return NULL;
+    }
+
+    req->http_options = http_options;
+    req->encrypt_options = encrypt_options;
+    req->bridge_options = bridge_options;
+    req->bucket_name = bucket_name;
+    req->encrypted_bucket_name = NULL;
+    req->response = NULL;
+    req->bucket = NULL;
+    req->error_code = 0;
+    req->status_code = 0;
+    req->handle = handle;
+
+    return req;
+}
