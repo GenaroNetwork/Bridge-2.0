@@ -107,6 +107,11 @@ fn main() {
         .wait().unwrap();
     println!("extra {:#?}", node_info);
 
+    // 测试 get_global_var
+    let global_var = g.get_global_var(BlockNumber::Latest)
+        .wait().unwrap();
+    println!("extra {:#?}", global_var);
+
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);

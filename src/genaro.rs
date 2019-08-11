@@ -162,6 +162,15 @@ impl<T: Transport> Genaro<T> {
     {
         CallFuture::new(self.transport.execute("admin_nodeInfo", vec![]))
     }
+    pub fn get_global_var(
+        &self,
+        block: BlockNumber,
+    )
+        -> web3::helpers::CallFuture<Option<GlobalVar>, T::Out>
+    {
+        let block_value = serialize(&block);
+        CallFuture::new(self.transport.execute("eth_getGlobalVar", vec![block_value]))
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -296,4 +305,41 @@ struct NodeProtocolEthConfigGenaro {
     valid_period: u32,
     period: u32,
     epoch: u64,
+}
+
+
+#[derive(Debug, Deserialize)]
+pub struct GlobalVar {
+    #[serde(rename(deserialize = "BackStackListMax"))]
+    back_stack_list_max: u32,
+    #[serde(rename(deserialize = "BindingAccount"))]
+    binding_account: String,
+    #[serde(rename(deserialize = "CoinRewardsRatio"))]
+    coin_rewards_ratio: u32,
+    #[serde(rename(deserialize = "CommitteeMinStake"))]
+    committee_min_stake: u32,
+    #[serde(rename(deserialize = "HeftAccount"))]
+    heft_account: String,
+    #[serde(rename(deserialize = "MaxBinding"))]
+    max_binding: u32,
+    #[serde(rename(deserialize = "MinStake"))]
+    min_stake: u32,
+    #[serde(rename(deserialize = "RatioPerYear"))]
+    ratio_per_year: u32,
+    #[serde(rename(deserialize = "StorageRewardsRatio"))]
+    storage_rewards_ratio: u32,
+    #[serde(rename(deserialize = "SynStateAccount"))]
+    syn_state_account: String,
+    #[serde(rename(deserialize = "bucketPricePerGperDay"))]
+    bucket_price_per_gper_day: String,
+    #[serde(rename(deserialize = "extraPrice"))]
+    extra_price: Option<String>,
+    #[serde(rename(deserialize = "oneDayMortgageGes"))]
+    one_day_mortgage_ges: String,
+    #[serde(rename(deserialize = "oneDaySyncLogGsaCost"))]
+    one_day_sync_log_gsa_cost: String,
+    #[serde(rename(deserialize = "stakeValuePerNode"))]
+    stake_value_per_node: String,
+    #[serde(rename(deserialize = "trafficPricePerG"))]
+    traffic_price_per_g: String,
 }
