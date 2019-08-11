@@ -215,3 +215,15 @@ static void get_bucket_request_worker(uv_work_t *work)
         }
     }
 }
+
+static void rename_bucket_request_worker(uv_work_t *work)
+{
+    rename_bucket_request_t *req = work->data;
+    int status_code = 0;
+    
+    req->error_code = fetch_json(req->http_options, req->encrypt_options,
+                                 req->options, req->method, req->path, NULL, req->body,
+                                 req->auth, &req->response, &status_code);
+    
+    req->status_code = status_code;
+}
