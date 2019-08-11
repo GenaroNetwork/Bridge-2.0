@@ -100,17 +100,25 @@ fn main() {
     // 测试 get_genaro_price
     let price = g.get_genaro_price(BlockNumber::Latest)
         .wait().unwrap();
-    println!("extra {:#?}", price);
+    println!("price {:#?}", price);
 
     // 测试 admin_node_info
     let node_info = g.admin_node_info()
         .wait().unwrap();
-    println!("extra {:#?}", node_info);
+    println!("admin_nodeInfo {:#?}", node_info);
 
     // 测试 get_global_var
     let global_var = g.get_global_var(BlockNumber::Latest)
         .wait().unwrap();
-    println!("extra {:#?}", global_var);
+    println!("global_var {:#?}", global_var);
+
+    // 测试 get_sub_accounts
+    let addr_vec = hex::decode("73e39b82d3fE58B52F718ea1aB85B4f4929e20d1").unwrap();
+    let mut addr = [0u8; 20];
+    addr.clone_from_slice(&addr_vec);
+    let sub_accounts = g.get_sub_accounts(addr.into(), BlockNumber::Latest)
+        .wait().unwrap();
+    println!("sub_accounts {:?}", sub_accounts);
 
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];

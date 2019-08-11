@@ -171,6 +171,17 @@ impl<T: Transport> Genaro<T> {
         let block_value = serialize(&block);
         CallFuture::new(self.transport.execute("eth_getGlobalVar", vec![block_value]))
     }
+    pub fn get_sub_accounts(
+        &self,
+        address: H160,
+        block: BlockNumber,
+    )
+        -> web3::helpers::CallFuture<Option<serde_json::Value>, T::Out>
+    {
+        let address_value = serialize(&address);
+        let block_value = serialize(&block);
+        CallFuture::new(self.transport.execute("eth_getSubAccounts", vec![address_value, block_value]))
+    }
 }
 
 #[derive(Debug, Deserialize)]
