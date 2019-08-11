@@ -120,6 +120,14 @@ fn main() {
         .wait().unwrap();
     println!("sub_accounts {:?}", sub_accounts);
 
+    // 测试 main_account
+    let addr_vec = hex::decode("73e39b82d3fE58B52F718ea1aB85B4f4929e20d1").unwrap();
+    let mut addr = [0u8; 20];
+    addr.clone_from_slice(&addr_vec);
+    let main_account = g.get_main_account(addr.into(), BlockNumber::Latest)
+        .wait().unwrap();
+    println!("main_account {:?}", main_account);
+
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);
