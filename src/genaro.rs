@@ -204,6 +204,18 @@ impl<T: Transport> Genaro<T> {
         let to = serialize(&to_block.unwrap_or(BlockNumber::Latest));
         CallFuture::new(self.transport.execute("eth_pendingTransactions", vec![from, to]))
     }
+    // 分享文件的交易数据
+    pub fn get_synchronize_share_key(
+        &self,
+        from_block: Option<BlockNumber>,
+        to_block: Option<BlockNumber>,
+    )
+        -> web3::helpers::CallFuture<Option<serde_json::Value>, T::Out>
+    {
+        let from = serialize(&from_block.unwrap_or(BlockNumber::Earliest));
+        let to = serialize(&to_block.unwrap_or(BlockNumber::Latest));
+        CallFuture::new(self.transport.execute("eth_getSynchronizeShareKey", vec![from, to]))
+    }
 }
 
 #[derive(Debug, Deserialize)]
