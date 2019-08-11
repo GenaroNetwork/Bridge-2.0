@@ -148,3 +148,70 @@ static void get_buckets_request_worker(uv_work_t *work)
         }
     }
 }
+
+static void get_bucket_request_worker(uv_work_t *work)
+{
+    get_bucket_request_t *req = work->data;
+    int status_code = 0;
+
+    req->error_code = fetch_json(req->http_options, req->encrypt_options,
+                                 req->options, req->method, req->path, NULL, req->body,
+                                 req->auth, &req->response, &status_code);
+
+    req->status_code = status_code;
+
+    if (!req->response) {
+        req->bucket = NULL;
+        return;
+    }
+
+    struct json_object *id;
+    struct json_object *name;
+    struct json_object *created;
+    struct json_object *bucketId;
+    struct json_object *type;
+    struct json_object *limitStorage;
+    struct json_object *usedStorage;
+    struct json_object *timeStart;
+    struct json_object *timeEnd;
+
+    json_object_object_get_ex(req->response, "id", &id);
+    json_object_object_get_ex(req->response, "name", &name);
+    json_object_object_get_ex(req->response, "created", &created);
+    json_object_object_get_ex(req->response, "bucketId", &bucketId);
+    json_object_object_get_ex(req->response, "type", &type);
+    json_object_object_get_ex(req->response, "limitStorage", &limitStorage);
+    json_object_object_get_ex(req->response, "usedStorage", &usedStorage);
+    json_object_object_get_ex(req->response, "timeStart", &timeStart);
+    json_object_object_get_ex(req->response, "timeEnd", &timeEnd);
+
+    req->bucket = malloc(sizeof(genaro_bucket_meta_t));
+    req->bucket->id = json_object_get_string(id);
+    req->bucket->decrypted = false;
+    req->bucket->created = json_object_get_string(created);
+    req->bucket->bucketId = json_object_get_string(bucketId);
+    req->bucket->type = json_object_get_int(type);
+    req->bucket->name = NULL;
+    req->bucket->limitStorage = json_object_get_int64(limitStorage);
+    req->bucket->usedStorage = json_object_get_int64(usedStorage);
+    req->bucket->timeStart = json_object_get_int64(timeStart);
+    req->bucket->timeEnd = json_object_get_int64(timeEnd);
+
+    const char *encrypted_name = json_object_get_string(name);
+    if (encrypted_name) {
+        char *decrypted_name = NULL;
+        int error_status = decrypt_meta_hmac_sha512(encrypted_name,
+                                                    req->encrypt_options->priv_key,
+                                                    req->encrypt_options->key_len,
+                                                    BUCKET_NAME_MAGIC,
+                                                    &decrypted_name);  
+        
+        if (!error_status) {
+            req->bucket->decrypted = true;
+            req->bucket->name = decrypted_name;
+        } else {
+            req->bucket->decrypted = false;
+            req->bucket->name = strdup(encrypted_name);
+        }
+    }
+}
