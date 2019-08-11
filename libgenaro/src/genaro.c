@@ -490,3 +490,37 @@ static get_bucket_request_t *get_bucket_request_new(
 
     return req;
 }
+
+static rename_bucket_request_t *rename_bucket_request_new(
+                                                    genaro_http_options_t *http_options,
+                                                    genaro_bridge_options_t *options,
+                                                    genaro_encrypt_options_t *encrypt_options,
+                                                    char *method,
+                                                    char *path,
+                                                    struct json_object *request_body,
+                                                    bool auth,
+                                                    const char *bucket_name,
+                                                    const char *encrypted_bucket_name,
+                                                    void *handle)
+{
+    rename_bucket_request_t *req = malloc(sizeof(rename_bucket_request_t));
+    if (!req) {
+        return NULL;
+    }
+    
+    req->http_options = http_options;
+    req->options = options;
+    req->encrypt_options = encrypt_options;
+    req->method = method;
+    req->path = path;
+    req->auth = auth;
+    req->body = request_body;
+    req->response = NULL;
+    req->error_code = 0;
+    req->status_code = 0;
+    req->bucket_name = bucket_name;
+    req->encrypted_bucket_name = encrypted_bucket_name;
+    req->handle = handle;
+    
+    return req;
+}
