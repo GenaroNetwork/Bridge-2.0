@@ -155,6 +155,13 @@ impl<T: Transport> Genaro<T> {
         let block_value = serialize(&block);
         CallFuture::new(self.transport.execute("eth_getGenaroPrice", vec![block_value]))
     }
+    pub fn admin_node_info(
+        &self,
+    )
+        -> web3::helpers::CallFuture<Option<AdminNodeInfo>, T::Out>
+    {
+        CallFuture::new(self.transport.execute("admin_nodeInfo", vec![]))
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -216,4 +223,61 @@ pub struct GenaroPrice {
     stake_value_per_node: U256,
     #[serde(rename(deserialize = "trafficPricePerG"))]
     traffic_price_per_g: U256,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AdminNodeInfo {
+    enode: String,
+    id: String,
+    ip: String,
+    listenAddr: String,
+    name: String,
+    ports: NodePort,
+    protocols: NodeProtocol,
+}
+
+#[derive(Debug, Deserialize)]
+struct NodePort {
+    discovery: u16,
+    listener: u16,
+}
+
+#[derive(Debug, Deserialize)]
+struct NodeProtocol {
+    eth: NodeProtocolEth
+}
+
+#[derive(Debug, Deserialize)]
+struct NodeProtocolEth {
+    difficulty: u32,
+    genesis: H256,
+    head: H256,
+    network: u32,
+    config: NodeProtocolEthConfig,
+}
+
+#[derive(Debug, Deserialize)]
+struct NodeProtocolEthConfig {
+    byzantiumBlock: u32,
+    chainId: u32,
+    eip150Block: u32,
+    eip150Hash: H256,
+    eip155Block: u32,
+    eip158Block: u32,
+    homesteadBlock: u32,
+    genaro: NodeProtocolEthConfigGenaro,
+}
+
+#[derive(Debug, Deserialize)]
+struct NodeProtocolEthConfigGenaro {
+    OfficialAddress: String,
+    PromissoryNotePrice: u32,
+    blockInterval: u32,
+    committeeMaxSize: u32,
+    currencyRates: u32,
+    electionPeriod: u32,
+    epoch: u64,
+    optionTxMemorySize: u32,
+    period: u32,
+    validPeriod: u32,
 }

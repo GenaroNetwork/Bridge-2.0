@@ -98,13 +98,18 @@ fn main() {
     println!("extra {:#?}", extra);
 
     // 测试 get_genaro_price
-    let extra = g.get_genaro_price(BlockNumber::Latest)
+    let price = g.get_genaro_price(BlockNumber::Latest)
         .wait().unwrap();
-    println!("extra {:#?}", extra);
+    println!("extra {:#?}", price);
+
+    // 测试 admin_node_info
+    let node_info = g.admin_node_info()
+        .wait().unwrap();
+    println!("extra {:#?}", node_info);
 
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);
     let balance = web3.eth().balance(addr.into(), None).wait().unwrap();
-    println!("balance {:#?}", balance)
+    println!("balance {:#?}", balance);
 }
