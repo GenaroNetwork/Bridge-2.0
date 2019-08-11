@@ -459,3 +459,34 @@ static get_buckets_request_t *get_buckets_request_new(
 
     return req;
 }
+
+static get_bucket_request_t *get_bucket_request_new(
+        genaro_http_options_t *http_options,
+        genaro_bridge_options_t *options,
+        genaro_encrypt_options_t *encrypt_options,
+        char *method,
+        char *path,
+        struct json_object *request_body,
+        bool auth,
+        void *handle)
+{
+    get_bucket_request_t *req = malloc(sizeof(get_bucket_request_t));
+    if (!req) {
+        return NULL;
+    }
+
+    req->http_options = http_options;
+    req->options = options;
+    req->encrypt_options = encrypt_options;
+    req->method = method;
+    req->path = path;
+    req->auth = auth;
+    req->body = request_body;
+    req->response = NULL;
+    req->bucket = NULL;
+    req->error_code = 0;
+    req->status_code = 0;
+    req->handle = handle;
+
+    return req;
+}
