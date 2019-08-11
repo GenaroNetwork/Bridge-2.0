@@ -278,4 +278,59 @@ static void list_files_request_worker(uv_work_t *work)
     
     req->total_files = num_visible_files;
 
+    int file_index = 0;
+    for (int i = 0; i < num_files; i++) {
+        file = json_object_array_get_idx(req->response, i);
+
+        json_object_object_get_ex(file, "filename", &filename);
+        json_object_object_get_ex(file, "mimetype", &mimetype);
+        json_object_object_get_ex(file, "size", &size);
+        json_object_object_get_ex(file, "id", &id);
+        json_object_object_get_ex(file, "created", &created);
+        json_object_object_get_ex(file, "rsaKey", &rsaKey);
+        json_object_object_get_ex(file, "rsaCtr", &rsaCtr);
+
+        // if this file is a shared file but we don't support share
+        if(!req->is_support_share && p_is_share[i]) {
+            continue;
+        }
+
+        genaro_file_meta_t *file_meta = &req->files[file_index];
+        file_index++;
+
+        file_meta->isShareFile = p_is_share[i];
+        file_meta->created = json_object_get_string(created);
+        file_meta->mimetype = json_object_get_string(mimetype);
+        file_meta->size = json_object_get_int64(size);
+        file_meta->erasure = NULL;
+        file_meta->index = NULL;
+        file_meta->hmac = NULL; // TODO though this value is not needed here
+        file_meta->id = json_object_get_string(id);
+        file_meta->decrypted = false;
+        file_meta->filename = NULL;
+        file_meta->rsaKey = json_object_get_string(rsaKey);
+        file_meta->rsaCtr = json_object_get_string(rsaCtr);
+
+        const char *encrypted_file_name = json_object_get_string(filename);
+        if (!encrypted_file_name) {
+            continue;
+        }
+
+        char *decrypted_file_name = NULL;
+        int error_status = decrypt_meta_hmac_sha512(encrypted_file_name,
+                                                    req->encrypt_options->priv_key,
+                                                    req->encrypt_options->key_len,
+                                                    req->bucket_id,
+                                                    &decrypted_file_name);
+
+        if (!error_status) {
+            file_meta->decrypted = true;
+            file_meta->filename = decrypted_file_name;
+        } else {
+            file_meta->decrypted = false;
+            file_meta->filename = strdup(encrypted_file_name);
+        }
+    }
+
+    free(p_is_share);
 }
