@@ -142,6 +142,13 @@ fn main() {
         .wait().unwrap();
     println!("share_key {:#?}", pending_transactions);
 
+    // 测试 get_synchronize_share_key
+    let account_by_name = g.get_account_by_name(
+        Some(BlockNumber::Number(200000)),
+        Some(BlockNumber::Number(286400)))
+        .wait().unwrap();
+    println!("account_by_name {:#?}", account_by_name);
+
     let addr_vec = hex::decode("871860e8854bc539ab2127b2c91637aebab22a1f").unwrap();
     let mut addr = [0u8; 20];
     addr.clone_from_slice(&addr_vec);

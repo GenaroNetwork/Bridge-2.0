@@ -216,6 +216,17 @@ impl<T: Transport> Genaro<T> {
         let to = serialize(&to_block.unwrap_or(BlockNumber::Latest));
         CallFuture::new(self.transport.execute("eth_getSynchronizeShareKey", vec![from, to]))
     }
+    pub fn get_account_by_name(
+        &self,
+        from_block: Option<BlockNumber>,
+        to_block: Option<BlockNumber>,
+    )
+        -> web3::helpers::CallFuture<Option<serde_json::Value>, T::Out>
+    {
+        let from = serialize(&from_block.unwrap_or(BlockNumber::Earliest));
+        let to = serialize(&to_block.unwrap_or(BlockNumber::Latest));
+        CallFuture::new(self.transport.execute("eth_getAccountByName", vec![from, to]))
+    }
 }
 
 #[derive(Debug, Deserialize)]
