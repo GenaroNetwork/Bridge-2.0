@@ -524,3 +524,26 @@ static rename_bucket_request_t *rename_bucket_request_new(
     
     return req;
 }
+
+static uv_work_t *json_request_work_new(
+    genaro_env_t *env,
+    char *method,
+    char *path,
+    struct json_object *request_body,
+    bool auth,
+    void *handle)
+{
+    uv_work_t *work = uv_work_new();
+    if (!work) {
+        return NULL;
+    }
+    work->data = json_request_new(env->http_options, env->encrypt_options,
+                                  env->bridge_options, method, path,
+                                  request_body, auth, handle);
+
+    if (!work->data) {
+        return NULL;
+    }
+
+    return work;
+}
