@@ -227,3 +227,55 @@ static void rename_bucket_request_worker(uv_work_t *work)
     
     req->status_code = status_code;
 }
+
+static void list_files_request_worker(uv_work_t *work)
+{
+    list_files_request_t *req = work->data;
+    int status_code = 0;
+
+    req->error_code = fetch_json(req->http_options, req->encrypt_options,
+                                 req->options, req->method, req->path, NULL, req->body,
+                                 req->auth, &req->response, &status_code);
+
+    req->status_code = status_code;
+
+    int num_files = 0;
+    if (req->response != NULL &&
+        json_object_is_type(req->response, json_type_array)) {
+        num_files = json_object_array_length(req->response);
+    }
+    
+    struct json_object *file;
+    struct json_object *filename;
+    struct json_object *mimetype;
+    struct json_object *size;
+    struct json_object *id;
+    struct json_object *created;
+    struct json_object *isShareFile;
+    struct json_object *rsaKey;
+    struct json_object *rsaCtr;
+
+    bool *p_is_share = NULL;
+    if (num_files > 0) {
+        p_is_share = (bool *)malloc(sizeof(bool) * num_files);
+    }
+
+    int num_visible_files = 0;
+    for (int i = 0; i < num_files; i++) {
+        file = json_object_array_get_idx(req->response, i);
+        json_object_object_get_ex(file, "isShareFile", &isShareFile);
+
+        p_is_share[i] = json_object_get_boolean(isShareFile);
+
+        if(req->is_support_share || !p_is_share[i]) {
+            num_visible_files++;
+        }
+    }
+
+    if(num_visible_files > 0) {
+        req->files = (genaro_file_meta_t *)malloc(sizeof(genaro_file_meta_t) * num_visible_files);
+    }
+    
+    req->total_files = num_visible_files;
+
+}
