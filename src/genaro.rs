@@ -193,6 +193,17 @@ impl<T: Transport> Genaro<T> {
         let block_value = serialize(&block);
         CallFuture::new(self.transport.execute("eth_getMainAccount", vec![address_value, block_value]))
     }
+    pub fn get_pending_transactions(
+        &self,
+        from_block: Option<BlockNumber>,
+        to_block: Option<BlockNumber>,
+    )
+        -> web3::helpers::CallFuture<Option<serde_json::Value>, T::Out>
+    {
+        let from = serialize(&from_block.unwrap_or(BlockNumber::Earliest));
+        let to = serialize(&to_block.unwrap_or(BlockNumber::Latest));
+        CallFuture::new(self.transport.execute("eth_pendingTransactions", vec![from, to]))
+    }
 }
 
 #[derive(Debug, Deserialize)]
