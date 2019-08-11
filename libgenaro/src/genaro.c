@@ -365,3 +365,39 @@ static json_request_t *json_request_new(
 
     return req;
 }
+
+static list_files_request_t *list_files_request_new(
+    genaro_http_options_t *http_options,
+    genaro_bridge_options_t *options,
+    genaro_encrypt_options_t *encrypt_options,
+    bool is_support_share,
+    const char *bucket_id,
+    char *method,
+    char *path,
+    struct json_object *request_body,
+    bool auth,
+    void *handle)
+{
+    list_files_request_t *req = malloc(sizeof(list_files_request_t));
+    if (!req) {
+        return NULL;
+    }
+
+    req->http_options = http_options;
+    req->options = options;
+    req->encrypt_options = encrypt_options;
+    req->is_support_share = is_support_share;
+    req->bucket_id = bucket_id;
+    req->method = method;
+    req->path = path;
+    req->auth = auth;
+    req->body = request_body;
+    req->response = NULL;
+    req->files = NULL;
+    req->total_files = 0;
+    req->error_code = 0;
+    req->status_code = 0;
+    req->handle = handle;
+
+    return req;
+}
