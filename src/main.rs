@@ -140,7 +140,7 @@ fn main() {
         Some(BlockNumber::Number(200000)),
         Some(BlockNumber::Number(286400)))
         .wait().unwrap();
-    println!("share_key {:#?}", pending_transactions);
+    println!("share_key {:#?}", share_key);
 
     // 测试 get_synchronize_share_key
     let account_by_name = g.get_account_by_name(
