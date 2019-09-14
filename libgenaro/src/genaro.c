@@ -547,3 +547,241 @@ static uv_work_t *json_request_work_new(
 
     return work;
 }
+
+static void list_files_request_worker(uv_work_t *work)
+{
+    list_files_request_t *req = work->data;
+    int status_code = 0;
+
+    req->error_code = fetch_json(req->http_options, req->encrypt_options,
+                                 req->options, req->method, req->path, NULL, req->body,
+                                 req->auth, &req->response, &status_code);
+
+    req->status_code = status_code;
+
+    int num_files = 0;
+    if (req->response != NULL &&
+        json_object_is_type(req->response, json_type_array)) {
+        num_files = json_object_array_length(req->response);
+    }
+    
+    struct json_object *file;
+    struct json_object *filename;
+    struct json_object *mimetype;
+    struct json_object *size;
+    struct json_object *id;
+    struct json_object *created;
+    struct json_object *isShareFile;
+    struct json_object *rsaKey;
+    struct json_object *rsaCtr;
+
+    bool *p_is_share = NULL;
+    if (num_files > 0) {
+        p_is_share = (bool *)malloc(sizeof(bool) * num_files);
+    }
+
+    int num_visible_files = 0;
+    for (int i = 0; i < num_files; i++) {
+        file = json_object_array_get_idx(req->response, i);
+        json_object_object_get_ex(file, "isShareFile", &isShareFile);
+
+        p_is_share[i] = json_object_get_boolean(isShareFile);
+
+        if(req->is_support_share || !p_is_share[i]) {
+            num_visible_files++;
+        }
+    }
+
+    if(num_visible_files > 0) {
+        req->files = (genaro_file_meta_t *)malloc(sizeof(genaro_file_meta_t) * num_visible_files);
+    }
+    
+    req->total_files = num_visible_files;
+
+    int file_index = 0;
+    for (int i = 0; i < num_files; i++) {
+        file = json_object_array_get_idx(req->response, i);
+
+        json_object_object_get_ex(file, "filename", &filename);
+        json_object_object_get_ex(file, "mimetype", &mimetype);
+        json_object_object_get_ex(file, "size", &size);
+        json_object_object_get_ex(file, "id", &id);
+        json_object_object_get_ex(file, "created", &created);
+        json_object_object_get_ex(file, "rsaKey", &rsaKey);
+        json_object_object_get_ex(file, "rsaCtr", &rsaCtr);
+
+        // if this file is a shared file but we don't support share
+        if(!req->is_support_share && p_is_share[i]) {
+            continue;
+        }
+
+        genaro_file_meta_t *file_meta = &req->files[file_index];
+        file_index++;
+
+        file_meta->isShareFile = p_is_share[i];
+        file_meta->created = json_object_get_string(created);
+        file_meta->mimetype = json_object_get_string(mimetype);
+        file_meta->size = json_object_get_int64(size);
+        file_meta->erasure = NULL;
+        file_meta->index = NULL;
+        file_meta->hmac = NULL; // TODO though this value is not needed here
+        file_meta->id = json_object_get_string(id);
+        file_meta->decrypted = false;
+        file_meta->filename = NULL;
+        file_meta->rsaKey = json_object_get_string(rsaKey);
+        file_meta->rsaCtr = json_object_get_string(rsaCtr);
+
+        const char *encrypted_file_name = json_object_get_string(filename);
+        if (!encrypted_file_name) {
+            continue;
+        }
+
+        char *decrypted_file_name = NULL;
+        int error_status = decrypt_meta_hmac_sha512(encrypted_file_name,
+                                                    req->encrypt_options->priv_key,
+                                                    req->encrypt_options->key_len,
+                                                    req->bucket_id,
+                                                    &decrypted_file_name);
+
+        if (!error_status) {
+            file_meta->decrypted = true;
+            file_meta->filename = decrypted_file_name;
+        } else {
+            file_meta->decrypted = false;
+            file_meta->filename = strdup(encrypted_file_name);
+        }
+    }
+
+    free(p_is_share);
+}
+
+static json_request_t *json_request_new(
+    genaro_http_options_t *http_options,
+    genaro_encrypt_options_t *encrypt_options,
+    genaro_bridge_options_t *options,
+    char *method,
+    char *path,
+    struct json_object *request_body,
+    bool auth,
+    void *handle)
+{
+
+    json_request_t *req = malloc(sizeof(json_request_t));
+    if (!req) {
+        return NULL;
+    }
+
+    req->http_options = http_options;
+    req->encrypt_options = encrypt_options;
+    req->options = options;
+    req->method = method;
+    req->path = path;
+    req->auth = auth;
+    req->body = request_body;
+    req->response = NULL;
+    req->error_code = 0;
+    req->status_code = 0;
+    req->handle = handle;
+
+    return req;
+}
+
+static list_files_request_t *list_files_request_new(
+    genaro_http_options_t *http_options,
+    genaro_bridge_options_t *options,
+    genaro_encrypt_options_t *encrypt_options,
+    bool is_support_share,
+    const char *bucket_id,
+    char *method,
+    char *path,
+    struct json_object *request_body,
+    bool auth,
+    void *handle)
+{
+    list_files_request_t *req = malloc(sizeof(list_files_request_t));
+    if (!req) {
+        return NULL;
+    }
+
+    req->http_options = http_options;
+    req->options = options;
+    req->encrypt_options = encrypt_options;
+    req->is_support_share = is_support_share;
+    req->bucket_id = bucket_id;
+    req->method = method;
+    req->path = path;
+    req->auth = auth;
+    req->body = request_body;
+    req->response = NULL;
+    req->files = NULL;
+    req->total_files = 0;
+    req->error_code = 0;
+    req->status_code = 0;
+    req->handle = handle;
+
+    return req;
+}
+
+
+static get_buckets_request_t *get_buckets_request_new(
+    genaro_http_options_t *http_options,
+    genaro_bridge_options_t *options,
+    genaro_encrypt_options_t *encrypt_options,
+    char *method,
+    char *path,
+    struct json_object *request_body,
+    bool auth,
+    void *handle)
+{
+    get_buckets_request_t *req = malloc(sizeof(get_buckets_request_t));
+    if (!req) {
+        return NULL;
+    }
+
+    req->http_options = http_options;
+    req->options = options;
+    req->encrypt_options = encrypt_options;
+    req->method = method;
+    req->path = path;
+    req->auth = auth;
+    req->body = request_body;
+    req->response = NULL;
+    req->buckets = NULL;
+    req->total_buckets = 0;
+    req->error_code = 0;
+    req->status_code = 0;
+    req->handle = handle;
+
+    return req;
+}
+
+static get_bucket_request_t *get_bucket_request_new(
+        genaro_http_options_t *http_options,
+        genaro_bridge_options_t *options,
+        genaro_encrypt_options_t *encrypt_options,
+        char *method,
+        char *path,
+        struct json_object *request_body,
+        bool auth,
+        void *handle)
+{
+    get_bucket_request_t *req = malloc(sizeof(get_bucket_request_t));
+    if (!req) {
+        return NULL;
+    }
+
+    req->http_options = http_options;
+    req->options = options;
+    req->encrypt_options = encrypt_options;
+    req->method = method;
+    req->path = path;
+    req->auth = auth;
+    req->body = request_body;
+    req->response = NULL;
+    req->bucket = NULL;
+    req->error_code = 0;
+    req->status_code = 0;
+    req->handle = handle;
+
+    return req;
+}
